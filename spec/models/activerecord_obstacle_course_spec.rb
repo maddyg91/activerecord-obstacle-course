@@ -299,7 +299,6 @@ describe 'ActiveRecord Obstacle Course' do
 
   it '16. returns the names of users who ordered one specific item' do
     expected_result = [user_3.name, user_2.name]
-
     # ----------------------- Using Raw SQL-----------------------
     users = ActiveRecord::Base.connection.execute("
       select
@@ -313,9 +312,16 @@ describe 'ActiveRecord Obstacle Course' do
     # ------------------------------------------------------------
 
     # ------------------ Using ActiveRecord ----------------------
-    # Solution goes here
-    # ------------------------------------------------------------
 
+
+    users = User.select(:name)
+                .where(order_items:{item_id: item_8.id})
+                .joins(:orders).joins("join order_items ON order_items.order_id=orders.id")
+                .distinct
+                .order(:name)
+                .pluck(:name)
+
+                # ------------------------------------------------------------
     # Expectation
     expect(users).to eq(expected_result)
   end
@@ -328,7 +334,7 @@ describe 'ActiveRecord Obstacle Course' do
     # ------------------------------------------------------------
 
     # ------------------ Using ActiveRecord ----------------------
-    # Solution goes here
+    names = Order.last.items.pluck(:name)
     # ------------------------------------------------------------
 
     # Expectation
@@ -352,7 +358,7 @@ describe 'ActiveRecord Obstacle Course' do
     # ------------------------------------------------------------
 
     # ------------------ Using ActiveRecord ----------------------
-    # Solution goes here
+    items_for_user_3_third_order = Order.where(user_id: 3)[2].items.pluck(:name)
     # ------------------------------------------------------------
 
     # Expectation
@@ -365,7 +371,7 @@ describe 'ActiveRecord Obstacle Course' do
     # -----------------------------------------------------------
 
     # ------------------ Using ActiveRecord ----------------------
-    # Solution goes here
+    average = Order.average(:amount)
     # ------------------------------------------------------------
 
     # Expectation
@@ -382,7 +388,7 @@ describe 'ActiveRecord Obstacle Course' do
     # -----------------------------------------------------------
 
     # ------------------ Using ActiveRecord ----------------------
-    # Solution goes here
+    average = Order.where(user_id: 3).average(:amount)
     # ------------------------------------------------------------
 
     # Expectation
@@ -400,7 +406,7 @@ describe 'ActiveRecord Obstacle Course' do
     # -----------------------------------------------------------
 
     # ------------------ Using ActiveRecord ---------------------
-    # Solution goes here
+    total_sales = Order.sum(:amount)
     # -----------------------------------------------------------
 
     # Expectation
@@ -416,7 +422,7 @@ describe 'ActiveRecord Obstacle Course' do
     # -----------------------------------------------------------
 
     # ------------------ Using ActiveRecord ---------------------
-    # Solution goes here
+    total_sales = Order.where.not(user_id: 2).sum(:amount)
     # -----------------------------------------------------------
 
     # Expectation
@@ -430,10 +436,10 @@ describe 'ActiveRecord Obstacle Course' do
     order_ids = OrderItem.where(item_id: item_4.id).map(&:order_id)
     orders = order_ids.map { |id| Order.find(id) }
     # -----------------------------------------------------------
-
     # ------------------ Improved Solution ----------------------
-    #  Solution goes here
+    orders = Order.joins(:items).where(order_items: {item_id: item_4.id})
     # -----------------------------------------------------------
+
 
     # Expectation
     expect(orders).to eq(expected_result)
