@@ -464,7 +464,9 @@ describe 'ActiveRecord Obstacle Course' do
 
   it '25. returns items that are associated with one or more orders' do
     unordered_item = Item.create(name: 'Unordered Item')
-    expected_result = [item_1, item_2, item_3, item_4, item_5, item_7, item_8, item_9, item_10]
+    expected_result = [
+      item_1, item_2, item_3, item_4, item_5, item_7, item_8, item_9, item_10
+    ]
 
     # ----------------------- Using Ruby -------------------------
     items = Item.all
@@ -477,7 +479,7 @@ describe 'ActiveRecord Obstacle Course' do
     # ------------------------------------------------------------
 
     # ------------------ ActiveRecord Solution ----------------------
-    # Solution goes here
+    ordered_items = Item.joins(:orders).distinct.to_a
     # ---------------------------------------------------------------
 
     # Expectations
@@ -510,7 +512,7 @@ describe 'ActiveRecord Obstacle Course' do
     # ------------------------------------------------------------
 
     # ------------------ ActiveRecord Solution ----------------------
-    # Solution goes here
+    ordered_items_names = Item.joins(:orders).distinct.pluck(:name)
     # When you find a solution, experiment with adjusting your method chaining
     # Which ones are you able to switch around without relying on Ruby's Enumerable methods?
     # ---------------------------------------------------------------
